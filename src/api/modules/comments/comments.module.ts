@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
-import { CommentsController } from '../../controllers/comments.controller';
-import { CommentsService } from '../comments/comments.service';
+import { MailModule } from '../../../mail/mail.module';
+import { PostsController } from '../../controllers/posts.controller';
+import { LoggerModule } from '../logger/logger.module';
 import { PostsModule } from '../posts/posts.module';
-import { LoggerModule } from '../logger/loger.module'; 
-
+import { CommentsService } from './comments.service';
 
 @Module({
-  imports: [PostsModule, LoggerModule],
-  controllers: [CommentsController],
+  imports: [PostsModule, LoggerModule, MailModule],
+  controllers: [PostsController],
   providers: [Array, CommentsService],
-  exports: [CommentsService]
+  exports: [CommentsService],
 })
 export class CommentsModule {}

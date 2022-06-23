@@ -1,34 +1,41 @@
-import { Body, Controller, Delete, Get, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { PostsService } from '../modules/posts/posts.service';
-import { Posts, CreatePost } from '../dto/post.dto';
-
+import { PostsDTO } from '../dto/post.dto';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly appService: PostsService) { }
+  constructor(private readonly appService: PostsService) {}
 
   @Get('get-all')
-  async getPosts(): Promise<Posts[]> {
+  async getPosts(): Promise<PostsDTO[]> {
     return this.appService.getPosts();
   }
 
   @Get('get-one')
-  async getPost(@Query() query: { id: number }): Promise<Posts | undefined> {
+  async getPost(@Query() query: { id: number }): Promise<PostsDTO | undefined> {
     return this.appService.getPost(query.id);
   }
 
   @Post('create')
-  async createPost(@Body() data: CreatePost): Promise<Posts> {
+  async createPost(@Body() data: PostsDTO): Promise<PostsDTO> {
     return this.appService.createPost(data);
   }
 
   @Delete('delete')
-  async deletePost(@Query() query: { id: number }): Promise<Posts[]> {
-    return this.appService.deletePost(query.id);
+  async deletePost(@Body() body: { id: number }): Promise<PostsDTO[]> {
+    return this.appService.deletePost(body.id);
   }
 
   @Put('update')
-  async updatePost(@Body() data: Posts): Promise<Posts> {
+  async updatePost(@Body() data: PostsDTO): Promise<PostsDTO> {
     return this.appService.updatePost(data);
   }
 }

@@ -1,11 +1,19 @@
-import { IsInt, IsPositive, IsString, IsDate, IsArray, IsOptional, IsObject, IsNotEmptyObject, MinLength, IsNotEmpty, IsEmail } from "class-validator";
-import { Comments } from "./comments.dto";
-import { UserInfo } from "./user.dto";
+import { CommentDTO } from './comment.dto';
+import { IsArray, IsDate, IsInt, IsPositive, IsString } from 'class-validator';
 
-export class CreatePost {
+export class PostsDTO {
+  @IsInt()
+  @IsPositive()
+  id!: number;
 
   @IsString()
   name!: string;
+
+  @IsDate()
+  createdAt!: Date;
+
+  @IsDate()
+  updatedAt!: Date;
 
   @IsString()
   description!: string;
@@ -14,41 +22,5 @@ export class CreatePost {
   text!: string;
 
   @IsArray()
-  @IsOptional()
-  comments!: Comments[];
-
-  // @IsObject()
-  // @IsNotEmptyObject()
-  //  userInfo!: UserInfo;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(3)
-  userName!: string;
-
-  @IsString()
-  @IsEmail()
-  userEmail!: string;
-
+  comments!: CommentDTO[];
 }
-
-export class Posts extends CreatePost {
-  @IsInt()
-  @IsPositive()
-  id!: number;
-
-  @IsDate()
-  @IsOptional()
-  createdAt!: Date;
-
-  @IsDate()
-  @IsOptional()
-  updatedAt!: Date;
-
-
-
-
-
-}
-
-

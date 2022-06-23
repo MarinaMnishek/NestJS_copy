@@ -1,54 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { Posts, CreatePost } from '../../dto/post.dto';
-import { UserInfo } from '../../dto/user.dto';
+import { PostsDTO } from '../../dto/post.dto';
 
-const posts: Posts[] = [
+const posts: PostsDTO[] = [
   {
     id: 1,
-    name: 'one',
-    description: 'one',
-    text: 'one',
+    name: 'fitst',
+    description: 'first',
+    text: 'first',
     createdAt: new Date(Date.now()),
     updatedAt: new Date(Date.now()),
     comments: [
       {
         id: 1,
-        text: 'comment number one',
+        text: 'comment',
         createdAt: new Date(Date.now()),
-        attachments: null
       },
       {
         id: 2,
-        text: 'comment number two',
+        text: 'second comment',
         createdAt: new Date(Date.now()),
-        attachments: null
-      }
+      },
     ],
-    // userInfo: {
-    //   userName: 'Ivan',
-    //   userEmail: '123@123.ru'
-    // }
-
-    userName: 'Ivan',
-    userEmail: '123@123.ru'
-  }
+  },
 ];
 
 let postId = 2;
 
 @Injectable()
 export class PostsService {
-  async getPosts(): Promise<Posts[]> {
+  async getPosts(): Promise<PostsDTO[]> {
     return posts;
   }
 
-  async getPost(id: number): Promise<Posts | undefined> {
+  async getPost(id: number): Promise<PostsDTO | undefined> {
     return posts[id - 1];
   }
 
-  async createPost(data: CreatePost): Promise<Posts> {
-       
-    const post: Posts = {
+  async createPost(data: PostsDTO): Promise<PostsDTO> {
+    const post: PostsDTO = {
       ...data,
       id: postId++,
       createdAt: new Date(Date.now()),
@@ -59,7 +48,7 @@ export class PostsService {
     return post;
   }
 
-  async updatePost(data: Posts): Promise<Posts> {
+  async updatePost(data: PostsDTO): Promise<PostsDTO> {
     let existingPost = posts[data.id];
     existingPost = {
       ...existingPost,
@@ -69,7 +58,7 @@ export class PostsService {
     return posts[data.id];
   }
 
-  async deletePost(id: number): Promise<Posts[]> {
+  async deletePost(id: number): Promise<PostsDTO[]> {
     const index = posts.findIndex(item => item.id == id)
     if (index >= 0) {
       posts.splice(index, 1);

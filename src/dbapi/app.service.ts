@@ -11,7 +11,7 @@ export class AppService {
   ) {}
 
   async getPosts(): Promise<Posts[]> {
-    const posts = this.postsRepository.find();
+    const posts = this.postsRepository.find({ relations: ['comments'] });
     return posts;
   }
 
@@ -23,56 +23,29 @@ export class AppService {
     });
   }
 
-  async createPost(data: Posts): Promise<Posts[]> {
-    await this.postsRepository.save(data);
-    return this.postsRepository.find();
+  async createPost(data: Posts): Promise<Posts> {
+    return this.postsRepository.save(data);
   }
 
-  // async updatePost(data: Posts): Promise<Posts> {
-  //   const existingPost = await this.postsRepository.findOne({
-  //     where: {
-  //       id: data.id,
-  //     },
-  //   });
-  //   return this.postsRepository.save({
-  //     ...existingPost,
-  //     ...data,
-  //   });
-  // }
-
-  async updatePost(id: number, data: Posts): Promise<Posts[]> {
+  async updatePost(data: Posts): Promise<Posts> {
     const existingPost = await this.postsRepository.findOne({
       where: {
-        id
+        id: data.id,
       },
     });
-    await this.postsRepository.save({
+    return this.postsRepository.save({
       ...existingPost,
       ...data,
     });
-    return this.postsRepository.find()
   }
 
-  async deletePost(id: number): Promise<Posts[]> {
+  async deletePost(id: number): Promise<Posts> {
     const post = await this.postsRepository.findOne({
       where: {
         id,
       },
     });
-    if (post) {
-      await this.postsRepository.remove(post);
-      return this.postsRepository.find()
-    }
-
+    if (post) return this.postsRepository.remove(post);
     else throw new Error('Post not found');
   }
-  // async deletePost(id: number): Promise<Posts> {
-  //   const post = await this.postsRepository.findOne({
-  //     where: {
-  //       id,
-  //     },
-  //   });
-  //   if (post) return this.postsRepository.remove(post);
-  //   else throw new Error('Post not found');
-  // }
 }
