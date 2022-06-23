@@ -4,4 +4,6 @@ export class Comments {
   createdAt!: Date;
 
   text!: string;
+
+  attachments!: string | null;
 }

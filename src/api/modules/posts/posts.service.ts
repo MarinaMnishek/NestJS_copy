@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Posts } from '../../dto/post.dto';
+import { Posts, CreatePost } from '../../dto/post.dto';
+import { UserInfo } from '../../dto/user.dto';
 
 const posts: Posts[] = [
   {
@@ -13,86 +14,27 @@ const posts: Posts[] = [
       {
         id: 1,
         text: 'comment number one',
-        createdAt: new Date(Date.now())
+        createdAt: new Date(Date.now()),
+        attachments: null
       },
       {
         id: 2,
         text: 'comment number two',
-        createdAt: new Date(Date.now())
+        createdAt: new Date(Date.now()),
+        attachments: null
       }
-    ]
-  },
-  {
-    id: 2,
-    name: 'two',
-    description: 'first',
-    text: 'first',
-    createdAt: new Date(Date.now()),
-    updatedAt: new Date(Date.now()),
-    comments: [
-      {
-        id: 1,
-        text: 'comment number one',
-        createdAt: new Date(Date.now())
-      },
-      {
-        id: 2,
-        text: 'comment number two',
-        createdAt: new Date(Date.now())
-      },
-      {
-        id: 3,
-        text: 'comment number three',
-        createdAt: new Date(Date.now())
-      },
-      {
-        id: 4,
-        text: 'comment number four',
-        createdAt: new Date(Date.now())
-      }
-    ]
-  },
-  {
-    id: 3,
-    name: 'three',
-    description: 'three',
-    text: 'three',
-    createdAt: new Date(Date.now()),
-    updatedAt: new Date(Date.now()),
-    comments: [
-      {
-        id: 1,
-        text: 'comment number one',
-        createdAt: new Date(Date.now())
-      },
-      {
-        id: 2,
-        text: 'comment number two',
-        createdAt: new Date(Date.now())
-      }
-    ]
-  },
-  {
-    id: 4,
-    name: 'four',
-    description: 'four',
-    text: 'four',
-    createdAt: new Date(Date.now()),
-    updatedAt: new Date(Date.now()),
-    comments: [
-      {
-        id: 1,
-        text: 'comment number one',
-        createdAt: new Date(Date.now())
-      },
-      {
-        id: 2,
-        text: 'comment number two',
-        createdAt: new Date(Date.now())
-      }
-    ]
-  },
+    ],
+    // userInfo: {
+    //   userName: 'Ivan',
+    //   userEmail: '123@123.ru'
+    // }
+
+    userName: 'Ivan',
+    userEmail: '123@123.ru'
+  }
 ];
+
+let postId = 2;
 
 @Injectable()
 export class PostsService {
@@ -104,9 +46,17 @@ export class PostsService {
     return posts[id - 1];
   }
 
-  async createPost(data: Posts): Promise<Posts> {
-    posts.push(data);
-    return data;
+  async createPost(data: CreatePost): Promise<Posts> {
+       
+    const post: Posts = {
+      ...data,
+      id: postId++,
+      createdAt: new Date(Date.now()),
+      updatedAt: new Date(Date.now()),
+      
+    }
+    posts.push(post);
+    return post;
   }
 
   async updatePost(data: Posts): Promise<Posts> {
@@ -120,7 +70,7 @@ export class PostsService {
   }
 
   async deletePost(id: number): Promise<Posts[]> {
-    const index = posts.findIndex(item => item.id==id)
+    const index = posts.findIndex(item => item.id == id)
     if (index >= 0) {
       posts.splice(index, 1);
       return posts;
