@@ -1,11 +1,11 @@
 import { Body, Controller, Delete, Get, Post, Put, Query } from '@nestjs/common';
 import { PostsService } from '../modules/posts/posts.service';
-import { Posts } from '../dto/post.dto';
+import { Posts, CreatePost } from '../dto/post.dto';
 
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly appService: PostsService) {}
+  constructor(private readonly appService: PostsService) { }
 
   @Get('get-all')
   async getPosts(): Promise<Posts[]> {
@@ -17,8 +17,8 @@ export class PostsController {
     return this.appService.getPost(query.id);
   }
 
-  @Put('create')
-  async createPost(@Body() data: Posts): Promise<Posts> {
+  @Post('create')
+  async createPost(@Body() data: CreatePost): Promise<Posts> {
     return this.appService.createPost(data);
   }
 
@@ -27,7 +27,7 @@ export class PostsController {
     return this.appService.deletePost(query.id);
   }
 
-  @Post('update')
+  @Put('update')
   async updatePost(@Body() data: Posts): Promise<Posts> {
     return this.appService.updatePost(data);
   }
