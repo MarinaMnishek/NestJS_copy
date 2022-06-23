@@ -24,22 +24,18 @@ export class AppController {
     return this.appService.getPost(query.id);
   }
 
-  @Put('create')
-  async createPost(@Body() data: Posts): Promise<Posts[]> {
+  @Post('create')
+  async createPost(@Body() data: Posts): Promise<Posts> {
     return this.appService.createPost(data);
   }
 
-  // @Delete('delete')
-  // async deletePost(@Body() body: { id: number }): Promise<Posts> {
-  //   return this.appService.deletePost(body.id);
-  // }
   @Delete('delete')
-  async deletePost(@Query() query: { id: number }): Promise<Posts[]> {
-    return this.appService.deletePost(query.id);
+  async deletePost(@Body() body: { id: number }): Promise<Posts> {
+    return this.appService.deletePost(body.id);
   }
 
-  @Post('update')
-  async updatePost(@Query() query: {id:number}, @Body() data: Posts): Promise<Posts[]> {
-    return this.appService.updatePost(query.id, data);
+  @Put('update')
+  async updatePost(@Body() data: Posts): Promise<Posts> {
+    return this.appService.updatePost(data);
   }
 }

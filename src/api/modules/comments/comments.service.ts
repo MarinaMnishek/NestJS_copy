@@ -1,87 +1,94 @@
-import { Injectable, StreamableFile } from '@nestjs/common';
-import { Comments } from '../../dto/comments.dto';
+import { Injectable } from '@nestjs/common';
+import { CommentDTO } from '../../../api/dto/comment.dto';
+import { PostsDTO } from '../../dto/post.dto';
 import { PostsService } from '../posts/posts.service';
-import { createReadStream } from 'fs';
-import { join } from 'path';
-import { MyLogger } from '../logger/loger.service';
+import * as fs from 'fs';
+import { Response } from 'express';
+import { MyLogger } from '../logger/logger.service';
+import { MailService } from '../../../mail/mail.service';
 
 
+let commentId = 3;
 @Injectable()
 export class CommentsService {
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly mailService: MailService,
+    private myLogger: MyLogger,
+  ) {
+    this.myLogger.setContext('CommentsService');
+  }
 
-  constructor(private readonly postsService: PostsService,
-    private readonly logger: MyLogger ) {
-      this.logger.setContext('CommentsService')
-     }
-
-
-    
-  async getComments(postId: number): Promise<Comments[]> {
-    const posts = await this.postsService.getPosts()
+  async getComments(postId: number): Promise<CommentDTO[]> {
+    const posts = await this.postsService.getPosts();
     return posts[postId].comments;
   }
 
-  async getComment(postId: number, commentId: number): Promise<Comments | undefined> {
-    const posts = await this.postsService.getPosts()
-    const comments = posts[postId].comments
-    return comments[commentId];
-
+  async getComment(postId: number, commentId: number): Promise<CommentDTO> {
+    const posts = await this.postsService.getPosts();
+    return posts[postId].comments[commentId];
   }
 
-  async createComment(postId: number, data: Comments): Promise<Comments> {
+  async createComment(postId: number, data: CommentDTO): Promise<CommentDTO> {
+    const comment: CommentDTO = {
+      ...data,
+      id: commentId++,
+      createdAt: new Date(Date.now())
+
+    }
+
+    await this.mailService.sendMessage('testmail188@mail.ru')
     const posts = await this.postsService.getPosts()
-    posts[postId - 1].comments.push(data);
+
+    posts[postId].comments.push(comment);
+
     return data;
+
   }
 
-  async deleteComment(postId: number, commentId: number): Promise<Comments[]> {
+  async deleteComment(postId: number, commentId: number): Promise<PostsDTO[]> {
+
     const posts = await this.postsService.getPosts()
-    const post = posts[postId]
+    const post = posts[postId - 1]
+    console.log(posts[postId - 1]);
+
     const comments = post.comments
     const index = comments.findIndex(item => item.id == commentId)
     if (index >= 0) {
       comments.splice(index, 1);
-      return comments;
+      return posts;
     } else throw new Error('Comment not found');
   }
 
-   async updateComment(postId: number, commentId: number, data: Comments): Promise<Comments> {
+  async updateComment(postId: number, commentId: number, data: CommentDTO): Promise<CommentDTO> {
     const posts = await this.postsService.getPosts()
     const post = posts[postId - 1]
     const comments = post.comments
     const index = comments.findIndex(item => item.id == commentId)
+    const commentLast = comments[index].text
     let existingComment = comments[index];
     existingComment = {
       ...existingComment,
       ...data,
     };
     comments[commentId - 1] = existingComment;
-  
-    return comments[commentId-1];
+    const messageUpdate = { 'last': commentLast, 'now': comments[commentId - 1].text }
+    await this.mailService.sendMessageUpdateComment('testmail188@mail.ru', messageUpdate)
+    return comments[commentId - 1];
 
   }
 
-  async assignFile(postId: number, commentId: number, path: string): Promise<void> {
-    this.logger.warn('New pdf file assigned to post with id ' + postId + ' to comment with id ' + commentId);
-    
-    const posts = await this.postsService.getPosts()
-   posts[postId - 1].comments[commentId-1].attachments = path;
-    
+  async saveFile(path: string, data: Buffer) {
+    fs.writeFile(path, data, (error) => {
+      if (error) throw new Error(error.message);
+    });
   }
 
-  // async getFile(postId: number, commentId: number): Promise<StreamableFile | undefined> {
-  //   const posts = await this.postsService.getPosts()
-  //   const path = posts[postId].comments[commentId].attachments;
-  //   let file
-  //   if (path) {file = createReadStream(join(process.cwd(), path));}
-  //   if (file) return new StreamableFile(file);
-    
-  // }
-
-  async getPath(postId: number, commentId: number): Promise<string | null> {
-    const posts = await this.postsService.getPosts()
-   return posts[postId].comments[commentId].attachments;
-    
+  async getFile(response: Response) {
+    const buffer = fs.createReadStream('/Users/user/blog/files/receipt.pdf');
+    this.myLogger.warn('About to return cats!');
+    buffer.pipe(response).on('close', () => {
+      buffer.destroy();
+    });
   }
-
 }
