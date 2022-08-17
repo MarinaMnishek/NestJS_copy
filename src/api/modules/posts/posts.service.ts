@@ -97,6 +97,7 @@ const posts: Posts[] = [
 @Injectable()
 export class PostsService {
   async getPosts(): Promise<Posts[]> {
+    console.log('=====Something======');
     return posts;
   }
 
@@ -120,7 +121,7 @@ export class PostsService {
   }
 
   async deletePost(id: number): Promise<Posts[]> {
-    const index = posts.findIndex(item => item.id==id)
+    const index = posts.findIndex(item => item.id == id)
     if (index >= 0) {
       posts.splice(index, 1);
       return posts;
